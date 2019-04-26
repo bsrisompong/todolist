@@ -28,6 +28,13 @@ class App extends Component {
     this.setState({todolist: newlist, type:"", lastId:this.state.lastId+1});
   }
 
+  // onCreateNewItem=()=>{
+  //   this.setState(({todolist})) => ({
+  //     todolist: [...last,{id:lastId,title: 'Task ${lastID}',isCompleted:false}],
+  //     lastId: lastId+1,
+  //   });
+  // }
+//
   onCheck = (id) =>{
     const newlist = this.state.todolist.slice();
     // newlist[id].isCompleted = !newlist[id].isCompleted;
@@ -36,12 +43,13 @@ class App extends Component {
     this.setState({todolist: newlist});
   }
 
-  onEdit = (id,e) =>{
-    const newlist = this.state.todolist.slice();
-    const selectedItem = newlist.find((item)=>item.id===id)
-    selectedItem.title = e.target.value;
-    this.setState({todolist: newlist});
-  }
+  //
+  // onToggleListItem = (itemId) =>{
+  //     this.setState({}) => ({})
+  //
+  // }
+
+  //
 
   filterIncompleted(list){
     var newlist = list.slice();
@@ -77,10 +85,42 @@ class App extends Component {
 
     return(
       <div className='container'>
-        <Header {...this.state} onChange={this.onChange} onCreateNewItem={this.onCreateNewItem} completedList={completedList} onToggle={this.onToggleCompletedItem}/>
+        {/* Header */}
+        <div className="">
+          <h1>To-Do <small>List</small></h1>
+          <hr/>
+        </div>
+        <div className="">
+          <div className="row">
+            <div className="col">
+              <form class="form-inline">
+                <div className="form-group mr-2">
+                  <input className="form-control" type="text" value={this.state.type} onChange={this.onChange} placeholde="New List" required="required"/>
+                </div>
+                <div className="form-group mr-2">
+                  <button className="btn btn btn-primary" onClick={this.state.type !== "" && this.onCreateNewItem}>+</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
+            <div className="d-flex flex-row p-2">
+              <h2>{completedList.length} Completed</h2>
+              {/* <label className="btn btn-secondary"> */}
+            </div>
+          </div>
+          <div className="d-flex flex-row-reverse p-2">
+            <button  className="btn btn-secondary " onClick={this.onToggleCompletedItem}>{this.state.showCompleted?'HIDE':'SHOW'}</button>
+          </div>
+        </div>
+        {/* End Header */}
+
         <hr/>
-        {this.state.showCompleted && <List list={completedList} onCheck={this.onCheck} onDeleteTask={this.onDeleteTask} onEdit={this.onEdit} />}
-        <List list={incompletedList} onCheck={this.onCheck} onDeleteTask={this.onDeleteTask} onEdit={this.onEdit} />
+        {this.state.showCompleted && <List list={completedList} onCheck={this.onCheck} onDeleteTask={this.onDeleteTask} />}
+        <List list={incompletedList} onCheck={this.onCheck} onDeleteTask={this.onDeleteTask}  />
+        <Header {...this.state} onChange={this.onChange} onClick={this.onCreateNewItem} completedList={completedList}/>
       </div>
     )
   }
@@ -91,6 +131,7 @@ class App extends Component {
 class Header extends Component {
   render(){
     return(
+    // {/* Header */}
       <div className="">
         <h1>To-Do <small>List</small></h1>
         <hr/>
@@ -99,10 +140,10 @@ class Header extends Component {
             <div className="col">
               <form class="form-inline">
                 <div className="form-group mr-2">
-                  <input className="form-control" type="text" value={this.props.type} onChange={(e)=>this.props.onChange(e)} placeholde="New List" required="required"/>
+                  <input className="form-control" type="text" value={this.props.type} onChange={this.props.onChange} placeholde="New List" required="required"/>
                 </div>
                 <div className="form-group mr-2">
-                  <button className="btn btn btn-primary" onClick={this.props.type !== "" && ((e)=>this.props.onCreateNewItem(e))}>+</button>
+                  <button className="btn btn btn-primary" onClick={this.props.type !== "" && this.props.onCreateNewItem}>+</button>
                 </div>
               </form>
             </div>
@@ -116,10 +157,11 @@ class Header extends Component {
             </div>
           </div>
           <div className="d-flex flex-row-reverse p-2">
-            <button  className="btn btn-secondary auto" onClick={(e)=>this.props.onToggle(e)}>{this.props.showCompleted?'HIDE':'SHOW'}</button>
+            <button  className="btn btn-secondary " onClick={this.props.onToggleCompletedItem}>{this.props.showCompleted?'HIDE':'SHOW'}</button>
           </div>
         </div>
       </div>
+    // {/* End Header */}
     )
   }
 }
@@ -130,7 +172,7 @@ class List extends Component {
     return (
       <div className="">
         {this.props.list.map((item)=>
-          <ListItem key={item.id} {...item} onCheck={this.props.onCheck} onDeleteTask={this.props.onDeleteTask} onEdit={this.props.onEdit}/>
+          <ListItem key={item.id} {...item} onCheck={this.props.onCheck} onDeleteTask={this.props.onDeleteTask}/>
         )}
       </div>
     );
@@ -147,8 +189,12 @@ class ListItem extends Component {
     this.props.onDeleteTask(this.props.id)
   }
 
+  onClick = () =>{
+    // this.prop. (this.props.id)
+  }
+
   render(){
-    const { id, title, isCompleted} = this.props
+    const { id, title, isCompleted} = this.props // จัดว่ามีอะไรบ้างอยู่ใน state
     return(
       <div className="input-group mb-3">
         <div className="input-group-prepend">
@@ -156,8 +202,8 @@ class ListItem extends Component {
             <input className="" type="checkbox" checked={isCompleted} onChange={this.onChangeCheckbox} aria-label="Checkbox for following text input"/>
           </div>
         </div>
-        <input type="text" className="form-control" value={title} aria-label="Text input with checkbox" onChange={(e)=>this.props.onEdit(this.props.id,e)}></input>
-        <button className="btn btn-default " onClick={this.onDeleteTask}><i className="fa fa-times" /></button>
+        <input type="text" className="form-control" value={title} aria-label="Text input with checkbox" onClick={this.onClick}></input>
+        <button className="btn btn-danger btn-circle close" onClick={this.onDeleteTask}><i className="fa fa-times" /></button>
       </div>
     );
   }
